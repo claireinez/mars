@@ -6,12 +6,23 @@ const {
   FACING_WEST
 } = require('./constants.js');
 
+let lostPositions = [];
+
 function driveRobot(robot, gridLimit) {
   let position = robot.position;
+
   robot.instructions.split('').forEach(
-    instruction =>
-      position = updateRobotPosition(position, instruction, gridLimit)
+    instruction => {
+      position = updateRobotPosition(position, instruction, gridLimit, lostPositions);
+
+      const { x, y, orientation, isLost } = position;
+
+      if (isLost && !lostPositions.includes(`${ x }${ y }`)) {
+        lostPositions.push(`${ x }${ y }${ orientation }`);
+      }
+    }
   );
+
   return position;
 }
 
@@ -37,8 +48,10 @@ function turnRight(orientation) {
   return directions[orientation];
 }
 
-function moveForward(position, gridLimit) {
+function moveForward(position, gridLimit, lostPositions) {
   const { x, y, orientation } = position;
+
+  if (lostPositions.includes(`${ x }${ y }${ orientation }`)) return position;
 
   switch(orientation) {
     case FACING_NORTH:
@@ -64,7 +77,7 @@ function moveForward(position, gridLimit) {
   }
 }
 
-function updateRobotPosition(position, instruction, gridLimit) {
+function updateRobotPosition(position, instruction, gridLimit, lostPositions) {
   if (position.isLost) return position;
 
   switch(instruction) {
@@ -73,7 +86,7 @@ function updateRobotPosition(position, instruction, gridLimit) {
     case 'R':
       return Object.assign({}, position, { orientation: turnRight(position.orientation) });
     case 'F':
-      return moveForward(position, gridLimit);
+      return moveForward(position, gridLimit, lostPositions);
     default:
       throw new Error(`${ instruction } is not a valid instruction.`);
   }

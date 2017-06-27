@@ -35,7 +35,8 @@ test('moveForward', function(t) {
   t.deepEqual(
     moveForward(
       { x: 1, y: 1, orientation: 'N' },
-      { x: 5, y: 3 }
+      { x: 5, y: 3 },
+      []
     ),
     { x: 1, y: 2, orientation: 'N' },
     'should move North'
@@ -43,7 +44,8 @@ test('moveForward', function(t) {
   t.deepEqual(
     moveForward(
       { x: 1, y: 3, orientation: 'N' },
-      { x: 5, y: 3 }
+      { x: 5, y: 3 },
+      []
     ),
     { x: 1, y: 3, orientation: 'N', isLost: true },
     'should be lost moving North'
@@ -51,7 +53,8 @@ test('moveForward', function(t) {
   t.deepEqual(
     moveForward(
       { x: 1, y: 1, orientation: 'S' },
-      { x: 5, y: 3 }
+      { x: 5, y: 3 },
+      []
     ),
     { x: 1, y: 0, orientation: 'S' },
     'should move South'
@@ -59,7 +62,8 @@ test('moveForward', function(t) {
   t.deepEqual(
     moveForward(
       { x: 1, y: 0, orientation: 'S' },
-      { x: 5, y: 3 }
+      { x: 5, y: 3 },
+      []
     ),
     { x: 1, y: 0, orientation: 'S', isLost: true },
     'should be lost moving South'
@@ -67,7 +71,8 @@ test('moveForward', function(t) {
   t.deepEqual(
     moveForward(
       { x: 1, y: 1, orientation: 'E' },
-      { x: 5, y: 3 }
+      { x: 5, y: 3 },
+      []
     ),
     { x: 2, y: 1, orientation: 'E' },
     'should move East'
@@ -75,7 +80,8 @@ test('moveForward', function(t) {
   t.deepEqual(
     moveForward(
       { x: 5, y: 0, orientation: 'E' },
-      { x: 5, y: 3 }
+      { x: 5, y: 3 },
+      []
     ),
     { x: 5, y: 0, orientation: 'E', isLost: true },
     'should be lost moving East'
@@ -83,7 +89,8 @@ test('moveForward', function(t) {
   t.deepEqual(
     moveForward(
       { x: 1, y: 1, orientation: 'W' },
-      { x: 5, y: 3 }
+      { x: 5, y: 3 },
+      []
     ),
     { x:0, y: 1, orientation: 'W' },
     'should move West'
@@ -91,10 +98,20 @@ test('moveForward', function(t) {
   t.deepEqual(
     moveForward(
       { x: 0, y: 0, orientation: 'W' },
-      { x: 5, y: 3 }
+      { x: 5, y: 3 },
+      []
     ),
     { x: 0, y: 0, orientation: 'W', isLost: true },
     'should be lost moving West'
+  );
+  t.deepEqual(
+    moveForward(
+      { x: 0, y: 0, orientation: 'W' },
+      { x: 5, y: 3 },
+      ['00W']
+    ),
+    { x: 0, y: 0, orientation: 'W' },
+    'should detect scent of lost robot and not move forward'
   );
   t.end();
 });
@@ -104,7 +121,8 @@ test('updateRobotPosition', function(t) {
     updateRobotPosition(
       { x: 0, y: 3, orientation: 'E' },
       'L',
-      { x: 5, y: 5 }
+      { x: 5, y: 5 },
+      []
     ),
     { x: 0, y: 3, orientation: 'N' },
     'should turn left'
@@ -113,7 +131,8 @@ test('updateRobotPosition', function(t) {
     updateRobotPosition(
       { x: 0, y: 3, orientation: 'E' },
       'R',
-      { x: 5, y: 5 }
+      { x: 5, y: 5 },
+      []
     ),
     { x: 0, y: 3, orientation: 'S' },
     'should turn right'
@@ -122,7 +141,8 @@ test('updateRobotPosition', function(t) {
     updateRobotPosition(
       { x: 0, y: 3, orientation: 'E' },
       'F',
-      { x: 5, y: 5 }
+      { x: 5, y: 5 },
+      []
     ),
     { x: 1, y: 3, orientation: 'E' },
     'should move forward'
@@ -131,7 +151,8 @@ test('updateRobotPosition', function(t) {
     updateRobotPosition(
       { x: 5, y: 3, orientation: 'E', isLost: true },
       'F',
-      { x: 5, y: 5 }
+      { x: 5, y: 5 },
+      []
     ),
     { x: 5, y: 3, orientation: 'E', isLost: true },
     'should not change position if lost'
@@ -161,6 +182,17 @@ test('driveRobot', function(t) {
     ),
     { x: 3, y: 3, orientation: 'N', isLost: true },
     'should get lost'
+  );
+  t.deepEqual(
+    driveRobot(
+      {
+        position: { x: 0, y: 3, orientation: 'W' },
+        instructions: 'LLFFFLFLFL'
+      },
+      { x: 5, y: 3 }
+    ),
+    { x: 2, y: 3, orientation: 'S' },
+    'should not get lost after noticing scent of lost robot'
   );
   t.end();
 });
