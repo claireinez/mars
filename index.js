@@ -14,14 +14,22 @@ function instructRobots(file) {
   const [inputGrid, ...inputRobots] = instructionsArray;
   const grid = getGrid(inputGrid);
   const robots = getRobots(inputRobots);
+  let output = [];
 
   robots.forEach(robot => {
     const { x, y, orientation, isLost } = driveRobot(robot, grid);
 
-    console.log(`${ x } ${ y } ${ orientation }${ isLost ? ' LOST' : '' }`);
+    output.push(`${ x } ${ y } ${ orientation }${ isLost ? ' LOST' : '' }`);
   });
+
+  return output;
+}
+
+function init(file) {
+  instructRobots(file).forEach(output => console.log(output));
 }
 
 module.exports = {
-  init: instructRobots
+  init,
+  instructRobots
 };
