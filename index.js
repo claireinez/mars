@@ -1,6 +1,7 @@
 const fs = require('fs');
 
 const { getGrid, getRobots } = require('./src/inputTranslator.js');
+const { driveRobot } = require('./src/driver.js');
 
 function instructRobots(file) {
   const input = fs.readFileSync(file, 'utf-8');
@@ -14,8 +15,11 @@ function instructRobots(file) {
   const grid = getGrid(inputGrid);
   const robots = getRobots(inputRobots);
 
-  console.log(grid);
-  console.log(robots);
+  robots.forEach(robot => {
+    const { x, y, orientation, isLost } = driveRobot(robot, grid);
+
+    console.log(`${ x } ${ y } ${ orientation }${ isLost ? ' LOST' : '' }`);
+  });
 }
 
 module.exports = {
